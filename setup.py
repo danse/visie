@@ -7,7 +7,7 @@ setup(
     entry_points = {
         'console_scripts':[
             'vishnje = vishnje.server:present',
-            'v-tornado = vishnje.tornado:run',
+            'vis-tornado = vishnje.tornado:run',
             ],
     }
     )
