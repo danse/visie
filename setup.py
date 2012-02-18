@@ -8,6 +8,7 @@ setup(
         'console_scripts':[
             'vishnje = vishnje.server:present',
             'vis-tornado = vishnje.tornado:run',
+            'vis-line = vishnje.line:run',
             ],
     }
     )
