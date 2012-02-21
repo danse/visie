@@ -4,6 +4,7 @@ setup(
     name='vishnje',
     include_package_data=True,
     packages=find_packages(),
+    install_requires='CherryPy',
     entry_points = {
         'console_scripts':[
             'vishnje = vishnje.server:present',
