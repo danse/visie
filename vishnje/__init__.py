@@ -92,5 +92,12 @@ def marimekko():
         ))
 available.append('marimekko')
 
+def bar():
+    present(Example(
+        path='/d3/examples/bar/bar.html',
+        data='/d3/examples/bar/sample-data.csv',
+        ))
+available.append('bar')
+
 if __name__=='__main__':
     logging.info(format('\n\t'.join(available)))

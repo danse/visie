@@ -12,6 +12,7 @@ setup(
             'vis-crimea_stacked_area = vishnje:crimea_stacked_area',
             'vis-zoom = vishnje:zoom',
             'vis-marimekko = vishnje:marimekko',
+            'vis-bar = vishnje:bar',
             ],
     }
     )
