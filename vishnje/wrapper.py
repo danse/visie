@@ -62,7 +62,35 @@ def parallel():
         path='/d3/examples/parallel/parallel.html',
         data='/d3/examples/parallel/cars.csv',
         ))
-available += 'parallel'
+available.append('parallel')
+
+def splom():
+    present(Example(
+        path='/d3/examples/splom/splom.html',
+        data='/d3/examples/splom/flowers.json',
+        ))
+available.append('splom')
+
+def crimea_stacked_area():
+    present(Example(
+        path='/d3/examples/crimea/crimea-stacked-area.html',
+        data='/d3/examples/crimea/crimea.csv',
+        ))
+available.append('crimea_stacked_area')
+
+def zoom():
+    present(Example(
+        path='/d3/examples/zoom/zoom.html',
+        data='/d3/examples/zoom/sp500.csv',
+        ))
+available.append('zoom')
+
+def marimekko():
+    present(Example(
+        path='/d3/examples/marimekko/marimekko.html',
+        data='/d3/examples/marimekko/marimekko.json',
+        ))
+available.append('marimekko')
 
 if __name__=='__main__':
-    logging.info(format('\t\n'.join(available)))
+    logging.info(format('\n\t'.join(available)))
