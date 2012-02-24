@@ -7,14 +7,11 @@ setup(
     install_requires='CherryPy',
     entry_points = {
         'console_scripts':[
-            'vishnje = vishnje.server:present',
-            'vis-tornado = vishnje.tornado:run',
-            'vis-line = vishnje.line:run',
-            'vis-parallel = vishnje.wrapper:parallel',
-            'vis-splom = vishnje.wrapper:splom',
-            'vis-crimea_stacked_area = vishnje.wrapper:crimea_stacked_area',
-            'vis-zoom = vishnje.wrapper:zoom',
-            'vis-marimekko = vishnje.wrapper:marimekko',
+            'vis-parallel = vishnje:parallel',
+            'vis-splom = vishnje:splom',
+            'vis-crimea_stacked_area = vishnje:crimea_stacked_area',
+            'vis-zoom = vishnje:zoom',
+            'vis-marimekko = vishnje:marimekko',
             ],
     }
     )
