@@ -2,38 +2,40 @@ import os
 import sys
 import logging
 import webbrowser
+import pkg_resources
 from collections import namedtuple
+from optparse import OptionParser
 
 import cherrypy
 from cherrypy.lib.static import serve_file
 
+logging.basicConfig(level=logging.INFO)
+
 Example = namedtuple('Example', 'path data')
 
-def process(file, example):
-
-    pwd = "/home/francesco/repos/vishnje/vishnje/"
+def serve(example, data):
 
     path = example.path
-    assert os.path.exists(path)
-    data = example.data
     dir  = os.path.dirname(path)
+    current_dir  = os.path.abspath(pkg_resources.resource_filename(__name__, '.'))
 
-    def serve_data(): return file
+    def serve_data(): return data
     serve_data.exposed = True
 
     config = {
+        # for d3.js
         '/d3' : {
             'tools.staticdir.on'  : True,
-            'tools.staticdir.dir' : pwd+'/d3',
+            'tools.staticdir.dir' : current_dir + '/d3',
         },
-        '/d3/examples/parallel' : {
+        dir : {
             'tools.staticdir.on'  : True,
-            'tools.staticdir.dir' : pwd+dir,
+            'tools.staticdir.dir' : current_dir + dir,
         }
     }
 
     cherrypy.tree.mount(root=None, config=config)
-    cherrypy.tree.mount(serve_data, '/'+data, config=config)
+    cherrypy.tree.mount(serve_data, example.data, config=config)
     cherrypy.engine.start_with_callback(
         webbrowser.open,
         ('http://localhost:8080/{path}'.format(path=path),),
@@ -41,20 +43,26 @@ def process(file, example):
     cherrypy.engine.block()
 
 def read():
-    if len(sys.argv) > 1:
-        with open(sys.argv[1]) as f: return f.read()
+    usage = "usage: %prog [options] data_file"
+    parser = OptionParser()
+    (options, args) = parser.parse_args()
+    if args:
+        with open(args[0]) as f: return f.read()
     else:
         logging.info('Reading from standard input')
         return sys.stdin.read()
 
 def present(example):
-    file = read()
-    process(file, example)
+    serve(example, read())
+
+available = ['Available visualizations:']
 
 def parallel():
     present(Example(
-        path='d3/examples/parallel/parallel.html',
-        data='d3/examples/parallel/cars.csv',
+        path='/d3/examples/parallel/parallel.html',
+        data='/d3/examples/parallel/cars.csv',
         ))
+available += 'parallel'
 
-if __name__=='__main__': parallel()
+if __name__=='__main__':
+    logging.info(format('\t\n'.join(available)))
