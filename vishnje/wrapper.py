@@ -1,27 +1,20 @@
 import os
-import cherrypy
+import sys
+import logging
 import webbrowser
-from cherrypy.lib.static import serve_file
-
 from collections import namedtuple
+
+import cherrypy
+from cherrypy.lib.static import serve_file
 
 Example = namedtuple('Example', 'path data')
 
-pwd = "/home/francesco/repos/vishnje/vishnje/"
-parallel = Example(
-    path='d3/examples/parallel/parallel.html',
-    data='d3/examples/parallel/cars.csv',
-    )
-test = Example(
-    path='d3/',
-    data='data',
-    )
+def process(file, example):
 
-def process(file):
+    pwd = "/home/francesco/repos/vishnje/vishnje/"
 
-    example = parallel
     path = example.path
-   #assert os.path.exists(path)
+    assert os.path.exists(path)
     data = example.data
     dir  = os.path.dirname(path)
 
@@ -47,7 +40,21 @@ def process(file):
         )
     cherrypy.engine.block()
 
-if __name__=='__main__':
-    import sys
-    with open(sys.argv[1]) as f: file = f.read()
-    process(file)
+def read():
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as f: return f.read()
+    else:
+        logging.info('Reading from standard input')
+        return sys.stdin.read()
+
+def present(example):
+    file = read()
+    process(file, example)
+
+def parallel():
+    present(Example(
+        path='d3/examples/parallel/parallel.html',
+        data='d3/examples/parallel/cars.csv',
+        ))
+
+if __name__=='__main__': parallel()
