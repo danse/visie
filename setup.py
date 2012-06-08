@@ -5,7 +5,10 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     install_requires='CherryPy',
-    scripts=['scripts/tornado'],
+    scripts=[
+        'scripts/tornado',
+        'scripts/bounded-tornado',
+        ],
     entry_points = {
         'console_scripts':[
             'vis-parallel = vishnje:parallel',

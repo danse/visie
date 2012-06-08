@@ -2,9 +2,12 @@
 from string import Template
 import logging
 import sys
+import optparse
 
 from vishnje.history import history
 from vishnje.launch import launch
+
+options, args = optparse.OptionParser().parse_args()
 
 template = Template('''
 <!DOCTYPE html>
@@ -44,6 +47,7 @@ template = Template('''
   <body>
         <script type="text/javascript">
         
+        var bound = $bound
         var data = $data
         var w = 600
         var h = 20
@@ -52,24 +56,31 @@ template = Template('''
             .attr('width', w + h + biggest_label_size)
             .attr('height', h * data.length)
         function draw(){
-            var x_scale    = d3.scale.linear().domain([d3.min(data), d3.max(data)]).range([0, w]);
+            var x_scale    = d3.scale.linear().domain([bound - d3.max(data), bound - d3.min(data)]).range([0, w]);
             var size_scale = d3.scale.linear().domain([0, data.length]).range([1, 50]);
             var g = chart.selectAll('g')
                 .data(data)
                 .enter().append('g')
                 .attr('transform', function(d, i){
-                    return 'translate('+x_scale(d)+', '+(i*h)+')';
+                    return 'translate('+x_scale(bound - d)+', '+(i*h)+')';
                     });
 
             g.append('circle')
                 .attr('r', function(d, i){
                     return size_scale(data.length - i);
                 })
-                .style('fill', function(d){ return 'steelblue'; })
+                .style('fill', function(d){
+                    if(d>bound){
+                        return 'red';
+                    }
+                    else{
+                        return 'steelblue';
+                    }
+                })
                 .style('fill-opacity', 0.5);
 
             g.append('text')
-                .text(function(d, i){return d3.round(d) ;}).attr('x', 40);
+                .text(function(d, i){return d3.round(bound - d) ;}).attr('x', 40);
             g.append('text')
                 .text(function(d, i){return (data.length - i) ;}).attr('fill', 'grey');
 
@@ -92,7 +103,7 @@ javascript_data = repr(data)
 
 logging.debug(data)
 
-page = template.safe_substitute(data=javascript_data)
+page = template.safe_substitute(data=javascript_data, bound=args[0])
 
 logging.debug(page)
 
