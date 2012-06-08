@@ -5,6 +5,7 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     install_requires='CherryPy',
+    scripts=['scripts/tornado'],
     entry_points = {
         'console_scripts':[
             'vis-parallel = vishnje:parallel',

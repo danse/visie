@@ -99,5 +99,7 @@ def bar():
         ))
 available.append('bar')
 
+# This won't work. Try placing the call into a __main__.py module inside the
+# package, instead.
 if __name__=='__main__':
     logging.info(format('\n\t'.join(available)))
