@@ -48,12 +48,13 @@ template = Template('''
         var w = 600
         var h = 20
         var biggest_label_size = 100
+        var biggest_point_radius = 50
         var chart = d3.select('body').append('svg')
-            .attr('width', w + h + biggest_label_size)
+            .attr('width', w + h + biggest_point_radius + biggest_label_size)
             .attr('height', h * data.length)
         function draw(){
             var x_scale    = d3.scale.linear().domain([d3.min(data), d3.max(data)]).range([0, w]);
-            var size_scale = d3.scale.linear().domain([0, data.length]).range([1, 50]);
+            var size_scale = d3.scale.linear().domain([0, data.length]).range([1, biggest_point_radius]);
             var g = chart.selectAll('g')
                 .data(data)
                 .enter().append('g')
@@ -69,9 +70,9 @@ template = Template('''
                 .style('fill-opacity', 0.5);
 
             g.append('text')
-                .text(function(d, i){return d3.round(d) ;}).attr('x', 40);
+                .text(function(d, i){return d3.round(d) ;}).attr('x', biggest_point_radius + 40);
             g.append('text')
-                .text(function(d, i){return (data.length - i) ;}).attr('fill', 'grey');
+                .text(function(d, i){return (data.length - i) ;}).attr('fill', 'grey').attr('x', biggest_point_radius);
 
             window.scrollTo(0,1000000);
         }
