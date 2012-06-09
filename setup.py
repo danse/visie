@@ -8,6 +8,7 @@ setup(
     scripts=[
         'scripts/tornado',
         'scripts/bounded-tornado',
+        'scripts/onepage-tornado',
         ],
     entry_points = {
         'console_scripts':[
