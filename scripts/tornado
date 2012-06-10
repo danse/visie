@@ -4,7 +4,7 @@ import logging
 import sys
 
 from vishnje.history import history
-from vishnje.launch import launch
+from vishnje.launch import launch, javascript_exit_handling
 
 template = Template('''
 <!DOCTYPE html>
@@ -84,6 +84,7 @@ template = Template('''
             window.scrollTo(0,1000000);
         }
         window.onload = draw
+        $exit_handling
         </script>
         <!--input type='button' onclick='draw()' /-->
         <!--div name='chart' class='chart' /-->
@@ -100,7 +101,10 @@ javascript_data = repr(data)
 
 logging.debug(data)
 
-page = template.safe_substitute(data=javascript_data)
+page = template.safe_substitute(
+    data=javascript_data,
+    exit_handling=javascript_exit_handling,
+    )
 
 logging.debug(page)
 

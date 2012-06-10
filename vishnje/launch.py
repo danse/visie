@@ -6,17 +6,22 @@ from optparse import OptionParser
 
 import cherrypy
 
+javascript_exit_handling = "window.onbeforeunload=function(e){window.location='http://localhost:8080/stop';}"
+
 def launch(page):
 
     def root(): return page
     root.exposed = True
+    def stop(): exit()
+    stop.exposed = True
 
-    cherrypy.tree.mount(root=root)
+    cherrypy.tree.mount(root, '/')
+    cherrypy.tree.mount(stop, '/stop')
     cherrypy.engine.start_with_callback(
         webbrowser.open,
         ('http://localhost:8080/',),
         )
-    cherrypy.engine.block() # This should be called by javascript
+    cherrypy.engine.block()
 
 def find_stream(args=None):
     if args:
