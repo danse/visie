@@ -1,1 +1,0 @@
-find d3/examples/  | grep -e csv -e json | while read file; do grep -Rl $(basename $file) d3/examples/*; done | while read file; do echo "http://localhost:8000/${file}"; done | grep html | xargs firefox
