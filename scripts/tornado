@@ -2,6 +2,7 @@
 from string import Template
 import logging
 import sys
+import optparse
 
 from vishnje.history import history
 from vishnje.launch import launch, javascript_exit_handling
@@ -45,21 +46,29 @@ template = Template('''
         <script type="text/javascript">
         
         var data = $data
-        var w = 600
         var h = 20
+		var compress = $compress
+		if(compress){
+			var total_h = h * data.length;
+		}
+		else{
+			var total_h = 1000;
+		}
+        var w = 600
         var biggest_label_size = 100
         var biggest_point_radius = 50
         var chart = d3.select('body').append('svg')
             .attr('width', w + h + biggest_point_radius + biggest_label_size)
-            .attr('height', h * data.length)
+            .attr('height', total_h)
         function draw(){
             var x_scale    = d3.scale.linear().domain([d3.min(data), d3.max(data)]).range([0, w]);
+            var y_scale    = d3.scale.linear().domain([0, data.length]).range([0, total_h]);
             var size_scale = d3.scale.linear().domain([0, data.length]).range([1, biggest_point_radius]);
             var g = chart.selectAll('g')
                 .data(data)
                 .enter().append('g')
                 .attr('transform', function(d, i){
-                    return 'translate('+x_scale(d)+', '+(i*h)+')';
+                    return 'translate('+x_scale(d)+', '+y_scale(i)+')';
                     });
 
             g.append('circle')
@@ -76,34 +85,42 @@ template = Template('''
                 })
                 .style('fill-opacity', 0.5);
 
-            g.append('text')
-                .text(function(d, i){return d3.round(d) ;}).attr('x', biggest_point_radius + 40);
-            g.append('text')
-                .text(function(d, i){return (data.length - i) ;}).attr('fill', 'grey').attr('x', biggest_point_radius);
+            if(!compress){
+				g.append('text')
+		            .text(function(d, i){return d3.round(d) ;}).attr('x', biggest_point_radius + 40);
+		        g.append('text')
+		            .text(function(d, i){return (data.length - i) ;}).attr('fill', 'grey').attr('x', biggest_point_radius);
+			}
 
             window.scrollTo(0,1000000);
         }
         window.onload = draw
         $exit_handling
         </script>
-        <!--input type='button' onclick='draw()' /-->
-        <!--div name='chart' class='chart' /-->
   </body>
 </html>
 ''')
 
 logging.basicConfig(level=logging.INFO)
 
-data = [float(line) for line in sys.stdin]
-data = [r for r in reversed(history(reversed(data)))]
+data = list(reversed(list(map(float, sys.stdin))))
 
 javascript_data = repr(data)
 
 logging.debug(data)
 
+parser = optparse.OptionParser()
+parser.add_option(
+	'-c', '--compress', action='store_true',
+	dest='compress', default=False
+	)
+options, args = parser.parse_args()
+compress = 'true' if options.compress else 'false'
+
 page = template.safe_substitute(
     data=javascript_data,
     exit_handling=javascript_exit_handling,
+    compress=compress,
     )
 
 logging.debug(page)
