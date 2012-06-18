@@ -49,10 +49,10 @@ template = Template('''
         var h = 20
 		var compress = $compress
 		if(compress){
-			var total_h = h * data.length;
+			var total_h = 1000;
 		}
 		else{
-			var total_h = 1000;
+			var total_h = h * data.length;
 		}
         var w = 600
         var biggest_label_size = 100
@@ -103,7 +103,7 @@ template = Template('''
 
 logging.basicConfig(level=logging.INFO)
 
-data = list(reversed(list(map(float, sys.stdin))))
+data = list(reversed(history((map(float, sys.stdin)))))
 
 javascript_data = repr(data)
 
