@@ -4,7 +4,6 @@ import logging
 import sys
 import optparse
 
-from vishnje.history import history
 from vishnje.launch import launch, javascript_exit_handling
 
 template = Template('''
@@ -46,19 +45,20 @@ template = Template('''
         <script type="text/javascript">
         
         var data = $data
-        var h = 20
 		var compress = $compress
+        var h = 20
+        var w = 600
+        var biggest_label_size = 100
+        var biggest_point_radius = 50
 		if(compress){
-			var total_h = 1000;
+			var total_h = 800;
 		}
 		else{
 			var total_h = h * data.length;
 		}
-        var w = 600
-        var biggest_label_size = 100
-        var biggest_point_radius = 50
+        var total_w = w + h + biggest_point_radius + biggest_label_size
         var chart = d3.select('body').append('svg')
-            .attr('width', w + h + biggest_point_radius + biggest_label_size)
+            .attr('width',  total_w)
             .attr('height', total_h)
         function draw(){
             var x_scale    = d3.scale.linear().domain([d3.min(data), d3.max(data)]).range([0, w]);
@@ -101,28 +101,48 @@ template = Template('''
 </html>
 ''')
 
-logging.basicConfig(level=logging.INFO)
 
-data = list(reversed(history((map(float, sys.stdin)))))
+def history(ll):
+    '''
+    >>> [c for c in history((1, 1, 1, 1, 1))]
+    [1.0, 1.0, 1.0, 1.0, 1.0]
+    >>> [c for c in history((1, 2, 3, 4, 5, 6, 7))]
+    [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+    '''
+    s = 0
+    for i,l in enumerate(ll):
+        s += float(l)
+        yield(s/(i+1))
 
-javascript_data = repr(data)
+if __name__ == '__main__':
 
-logging.debug(data)
+    logging.basicConfig(level=logging.INFO)
 
-parser = optparse.OptionParser()
-parser.add_option(
-	'-c', '--compress', action='store_true',
-	dest='compress', default=False
-	)
-options, args = parser.parse_args()
-compress = 'true' if options.compress else 'false'
+    data = list(reversed(list(history(reversed(list(map(float, sys.stdin)))))))
 
-page = template.safe_substitute(
-    data=javascript_data,
-    exit_handling=javascript_exit_handling,
-    compress=compress,
-    )
+    javascript_data = repr(data)
 
-logging.debug(page)
+    logging.debug(data)
 
-launch(page)
+    parser = optparse.OptionParser()
+    parser.add_option(
+        '-c', '--compress', action='store_true',
+        dest='compress', default=False
+        )
+    parser.add_option(
+        '-d', '--debug', action='store_true',
+        dest='debug', default=False
+        )
+    options, args = parser.parse_args()
+    compress = 'true' if options.compress else 'false'
+    if options.debug: print(data)
+
+    page = template.safe_substitute(
+        data=javascript_data,
+        exit_handling=javascript_exit_handling,
+        compress=compress,
+        )
+
+    logging.debug(page)
+
+    launch(page)
