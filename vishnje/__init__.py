@@ -10,32 +10,28 @@ javascript_exit_handling = "window.onbeforeunload=function(e){window.location='h
 
 class Application:
 
-    def __init__(page):
+    def __init__(self, page):
         self.page = page
         self.data = None
 
-    def init_data(data, path='/data'):
-        self.data      = data
-        self.data_path = path
+    def init_data(self, data, path='/data'):
+        self.data_content = data
+        self.data_path    = path
 
-    def root(self):
+    def index(self):
         return self.page
-    root.exposed = True
+    index.exposed = True
 
-    def serve_data(self):
-        return self.data
-    root.exposed = True
+    def data(self):
+        return self.data_content
+    data.exposed = True
 
-    @staticmethod
-    def stop():
+    def stop(self):
         exit()
     stop.exposed = True
 
     def launch(self):
-        cherrypy.tree.mount(self.root, '/')
-        cherrypy.tree.mount(self.stop, '/stop')
-        if self.data:
-            cherrypy.tree.mount(self.serve_data, self.data_path)
+        cherrypy.tree.mount(self, '/')
         cherrypy.engine.start_with_callback(
             webbrowser.open,
             ('http://localhost:8080/',),
@@ -50,11 +46,12 @@ def find_stream(args=None):
         logging.info('Reading from standard input')
         return sys.stdin
 
-def main():
+def main(page=None):
     usage = "usage: %prog [options] file.html"
     (options, args) = OptionParser().parse_args()
-    stream = find_stream(args)
-    page   = stream.read()
+    if not page:
+        stream = find_stream(args)
+        page   = stream.read()
     Application(page).launch()
 
 if __name__=='__main__': main()
