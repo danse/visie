@@ -6,12 +6,17 @@ from optparse import OptionParser
 
 import cherrypy
 
-javascript_exit_handling = "window.onbeforeunload=function(e){window.location='http://localhost:8080/stop';}"
+javascript_exit_handling = '''
+<script type='text/javascript'>
+    exit = function(e){window.location='http://localhost:8080/stop';}
+    window.onbeforeunload = exit
+</script>
+'''
 
 class Application:
 
     def __init__(self, page):
-        self.page = page
+        self.page = page.format(exit=javascript_exit_handling)
         self.data = None
 
     def init_data(self, data, path='/data'):
@@ -54,4 +59,5 @@ def main(page=None):
         page   = stream.read()
     Application(page).launch()
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    main()
