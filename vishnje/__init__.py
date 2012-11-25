@@ -3,6 +3,7 @@ import sys
 import logging
 import webbrowser
 from optparse import OptionParser
+import json
 
 import cherrypy
 
@@ -14,13 +15,18 @@ javascript_exit_handling = '''
 '''
 
 class Application:
+    '''
+    >>> application = Application('This should be HTML...')
+    >>> application.init_data(['this', 'will', 'become', 'json'])
+    >>> application.launch() # doctest: +SKIP
+    '''
 
     def __init__(self, page):
         self.page = page.format(exit=javascript_exit_handling)
         self.data = None
 
     def init_data(self, data, path='/data'):
-        self.data_content = data
+        self.data_content = json.dumps(data)
         self.data_path    = path
 
     def index(self):
