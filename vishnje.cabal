@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                vishnje
-version:             0.3.0.0
+version:             0.3.1.0
 -- synopsis:            
 -- description:         
 -- license:             
@@ -21,7 +21,7 @@ data-files: data/d3.v4.js,
             
 library
   exposed-modules:     Vishnje
-  -- other-modules:       
+  other-modules:       Paths_vishnje
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9, web-output, text
   -- hs-source-dirs:      
