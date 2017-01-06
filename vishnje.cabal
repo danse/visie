@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                vishnje
-version:             0.2.1.0
+version:             0.3.0.0
 -- synopsis:            
 -- description:         
 -- license:             
@@ -23,12 +23,12 @@ library
   exposed-modules:     Vishnje
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.8 && <4.9, web-output
+  build-depends:       base >=4.8 && <4.9, web-output, text
   -- hs-source-dirs:      
   default-language:    Haskell2010
 
 Test-Suite test
            type: exitcode-stdio-1.0
            main-is: test.hs
-           build-depends: base, web-output
+           build-depends: base, web-output, text
            default-language:    Haskell2010

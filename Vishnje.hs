@@ -1,18 +1,13 @@
-module Vishnje (
-  vishnje,
-  vishnjeFiles,
-  Style,
-  Logic,
-  Options,
-  D3Version,
-  IndexType
-  ) where
+{-# LANGUAGE OverloadedStrings #-}
+module Vishnje where
 
 import WebOutput (multiToTheBrowser)
 import Paths_vishnje (getDataFileName)
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
 
-newtype Style = Style String
-newtype Logic = Logic String
+newtype Style = Style T.Text
+newtype Logic = Logic T.Text
 
 data D3Version = Version2 | Version4 deriving Eq
 data IndexType = SVG | ChartDiv deriving Eq
@@ -26,7 +21,7 @@ defaultOptions = Options Version4 SVG
 
 getDataFileContent fileNameGetter path = do
   fileName <- fileNameGetter path
-  readFile fileName
+  T.readFile fileName
 
 getVishnjeFile = getDataFileContent getDataFileName
 
@@ -40,9 +35,9 @@ d3FileNameFromOptions (Options d3Version indexType)
   | d3Version == Version4 = "d3.v4.js"
                                                       
 
-makeIndex options = concat [start, d3, content, end]
+makeIndex options = T.concat [start, d3, content, end]
   where start = "<!DOCTYPE html> <meta charset=\"utf-8\"> <link rel=\"stylesheet\" href=\"style.css\">"
-        d3 = "<script type=\"text/javascript\" src=\"" ++ d3FileNameFromOptions options ++ "\"></script>"
+        d3 = T.concat ["<script type=\"text/javascript\" src=\"", d3FileNameFromOptions options, "\"></script>"]
         content = (if indexType options == SVG then "<svg width=\"900\" height=\"500\"></svg>" else "<div class=\"chart\"></div>")
         end = "<script type=\"text/javascript\" src=\"logic.js\"></script> <script type=\"text/javascript\" src=\"data.js\"></script>"
 
@@ -51,7 +46,7 @@ getCommonResources options = do
   pure [("index.html", makeIndex options), (d3FileName, d3)]
     where d3FileName = d3FileNameFromOptions options
 
-customVishnje :: Options -> (a -> String) -> Style -> Logic -> a -> IO ()
+customVishnje :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
 customVishnje options transform (Style style) (Logic logic) d = do
   common <- getCommonResources options
   multiToTheBrowser (common ++ custom)
@@ -60,11 +55,11 @@ customVishnje options transform (Style style) (Logic logic) d = do
           styleRes = ("style.css", style)
           logicRes = ("logic.js", logic)
           dRes = ("data.js", (pad . transform) d)
-          pad s = "vishnje(" ++ s ++ ")"
+          pad s = T.concat ["vishnje(", s, ")"]
 
 vishnje = customVishnje defaultOptions
 
-customVishnjeFiles :: Options -> (FilePath -> IO FilePath) -> (a -> String) -> a -> IO ()
+customVishnjeFiles :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO ()
 customVishnjeFiles options fileNameGetter transform d = do
   (style, logic) <- getStyleAndLogicData fileNameGetter
   customVishnje options transform style logic d
