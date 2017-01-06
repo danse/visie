@@ -1,7 +1,7 @@
-import Vishnje (vishnjeStandard)
+import Vishnje (vishnjeFiles)
 import Paths_vishnje (getDataFileName)
 
-testVishnje = vishnjeStandard getDataFileName show
+testVishnje = vishnjeFiles getDataFileName show
 
 main = do
   testVishnje [1, 2, 3]
