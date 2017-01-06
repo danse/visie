@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                vishnje
-version:             0.2.0.0
+version:             0.2.1.0
 -- synopsis:            
 -- description:         
 -- license:             
@@ -14,12 +14,10 @@ maintainer:          f.occhipinti@gmail.com
 build-type:          Simple
 -- extra-source-files:  
 cabal-version:       >=1.10
-data-files: data/index.html,
-            data/d3.v4.js,
+data-files: data/d3.v4.js,
             data/style.css,
             data/logic.js,
-            data/d3.v2.js,
-            data/index.v2.js
+            data/d3.v2.js
             
 library
   exposed-modules:     Vishnje
