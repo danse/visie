@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                vishnje
-version:             0.3.3.0
+version:             0.3.5.1
 -- synopsis:            
 -- description:         
 -- license:             
@@ -15,14 +15,16 @@ build-type:          Simple
 -- extra-source-files:  
 cabal-version:       >=1.10
 data-files: data/d3.v4.js,
+            data/d3.v3.js,
+            data/d3.v2.js,
             data/style.css,
-            data/logic.js,
-            data/d3.v2.js
+            data/logic.js
             
 library
   hs-source-dirs:      src
   exposed-modules:     Vishnje
                        Vishnje.ToTimeSeries
+                       Vishnje.Data
   other-modules:       Paths_vishnje
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9,

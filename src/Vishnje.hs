@@ -9,7 +9,7 @@ import qualified Data.Text.IO as T
 newtype Style = Style T.Text
 newtype Logic = Logic T.Text
 
-data D3Version = Version2 | Version4 deriving Eq
+data D3Version = Version2 | Version3 | Version4 deriving Eq
 data IndexType = SVG | ChartDiv deriving Eq
 
 data Options = Options {
@@ -32,6 +32,7 @@ getStyleAndLogicData fileNameGetter = do
 
 d3FileNameFromOptions (Options d3Version indexType)
   | d3Version == Version2 = "d3.v2.js"
+  | d3Version == Version3 = "d3.v3.js"
   | d3Version == Version4 = "d3.v4.js"
                                                       
 
