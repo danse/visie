@@ -1,4 +1,4 @@
-module Vishnje.ToTimeSeries where
+module Visie.ToTimeSeries where
 
 import Data.DateTime (DateTime)
 import Data.List (sortOn)

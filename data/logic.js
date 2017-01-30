@@ -14,7 +14,7 @@ var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
 var g = svg.append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function vishnje(data) {
+function visie(data) {
 
   x.domain(data.map(function(d, i) { return i; }));
   y.domain([0, d3.max(data)]);

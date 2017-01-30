@@ -1,6 +1,6 @@
 #### Troubleshooting
 
-##### Vishnje opens a visualisation with an image viewer, rather than with a browser
+##### Visie opens a visualisation with an image viewer, rather than with a browser
 
 This happened to me because the `index.html` file gets interpreted by
 my system as an SVG image, because it contains an SVG tag. I fixed

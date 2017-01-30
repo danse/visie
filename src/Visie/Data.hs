@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Vishnje.Data where
+module Visie.Data where
 
-import Vishnje.ToTimeSeries
+import Visie.ToTimeSeries
 import qualified Data.Text as T
 import Data.Time (UTCTime)
 

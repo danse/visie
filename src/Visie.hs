@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Vishnje where
+module Visie where
 
 import WebOutput (multiToTheBrowser)
-import Paths_vishnje (getDataFileName)
+import Paths_visie (getDataFileName)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
@@ -23,7 +23,7 @@ getDataFileContent fileNameGetter path = do
   fileName <- fileNameGetter path
   T.readFile fileName
 
-getVishnjeFile = getDataFileContent getDataFileName
+getVisieFile = getDataFileContent getDataFileName
 
 getStyleAndLogicData fileNameGetter = do
   style <- getDataFileContent fileNameGetter "data/style.css"
@@ -43,12 +43,12 @@ makeIndex options = T.concat [start, d3, content, end]
         end = "<script type=\"text/javascript\" src=\"logic.js\"></script> <script type=\"text/javascript\" src=\"data.js\"></script>"
 
 getCommonResources options = do
-  d3 <- getVishnjeFile ("data/" ++ d3FileName)
+  d3 <- getVisieFile ("data/" ++ d3FileName)
   pure [("index.html", makeIndex options), (d3FileName, d3)]
     where d3FileName = d3FileNameFromOptions options
 
-customVishnje :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
-customVishnje options transform (Style style) (Logic logic) d = do
+customVisie :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
+customVisie options transform (Style style) (Logic logic) d = do
   common <- getCommonResources options
   multiToTheBrowser (common ++ custom)
   return ()
@@ -56,13 +56,13 @@ customVishnje options transform (Style style) (Logic logic) d = do
           styleRes = ("style.css", style)
           logicRes = ("logic.js", logic)
           dRes = ("data.js", (pad . transform) d)
-          pad s = T.concat ["vishnje(", s, ")"]
+          pad s = T.concat ["visie(", s, ")"]
 
-vishnje = customVishnje defaultOptions
+visie = customVisie defaultOptions
 
-customVishnjeFiles :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO ()
-customVishnjeFiles options fileNameGetter transform d = do
+customVisieFiles :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO ()
+customVisieFiles options fileNameGetter transform d = do
   (style, logic) <- getStyleAndLogicData fileNameGetter
-  customVishnje options transform style logic d
+  customVisie options transform style logic d
 
-vishnjeFiles = customVishnjeFiles defaultOptions
+visieFiles = customVisieFiles defaultOptions
