@@ -1,35 +1,46 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Visie where
 
-import WebOutput (multiToTheBrowser)
+import WebOutput
 import Paths_visie (getDataFileName)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import Visie.Index
 
-newtype Style = Style T.Text
-newtype Logic = Logic T.Text
-
 data D3Version = Version2 | Version3 | Version4 deriving Eq
+
+-- resource description specified by the user, to be fetched from the
+-- `data/` directory in the user package and transformed into a
+-- Resource to be served
+data ResourceDesc =  ResourceDesc {
+  fetch :: FilePath,
+  serve :: String
+}
 
 data Options = Options {
   d3Version :: D3Version,
   indexType :: IndexType,
-  additionalResources :: [(String, T.Text)]
+  scriptDesc :: ResourceDesc,
+  styleDesc :: ResourceDesc,
+  additionalDesc :: [ResourceDesc]
 }
 
-defaultOptions = Options Version4 SVG []
+defaultOptions = Options {
+  d3Version = Version4,
+  indexType = SVG,
+  scriptDesc = ResourceDesc "data/script.js" "script.js",
+  styleDesc = ResourceDesc "data/style.css" "style.css",
+  additionalDesc = []
+  }
 
-getDataFileContent fileNameGetter path = do
-  fileName <- fileNameGetter path
-  T.readFile fileName
+getResource fileNameGetter (ResourceDesc { fetch = f, serve = s}) = do
+  fileName <- fileNameGetter f
+  content <- T.readFile fileName
+  return Resource { location = s, content = content }
 
-getVisieFile = getDataFileContent getDataFileName
-
-getStyleAndLogicData fileNameGetter = do
-  style <- getDataFileContent fileNameGetter "data/style.css"
-  logic <- getDataFileContent fileNameGetter "data/logic.js"
-  return (Style style, Logic logic)
+-- common resources are included in the Visie package and can use the
+-- local getter
+getCommonResource = getResource getDataFileName
 
 d3FileNameFromOptions o
   | v == Version2 = "d3.v2.js"
@@ -38,27 +49,32 @@ d3FileNameFromOptions o
   where v = d3Version o
                                                       
 getCommonResources options = do
-  d3 <- getVisieFile ("data/" ++ d3FileName)
-  pure [("index.html", makeIndex d3FileName (indexType options)), (d3FileName, d3)]
+  d3 <- getCommonResource d3ResourceDesc
+  pure [index, d3]
     where d3FileName = d3FileNameFromOptions options
+          index = Resource {
+            location = "index.html",
+            content = makeIndex d3FileName (indexType options)
+            }
+          d3ResourceDesc = ResourceDesc {
+            fetch = "data/" ++ d3FileName,
+            serve = d3FileName
+            }
 
-customVisie :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
-customVisie options transform (Style style) (Logic logic) d = do
+customVisie :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO ()
+customVisie options fileNameGetter transform d = do
   common <- getCommonResources options
-  multiToTheBrowser (common ++ custom ++ additional)
+  user <- sequence (map (getResource fileNameGetter) userDescriptors)
+  manyToTheBrowser (common ++ user ++ [dRes])
   return ()
-    where custom = [styleRes, logicRes, dRes]
-          styleRes = ("style.css", style)
-          logicRes = ("logic.js", logic)
-          dRes = ("data.js", (pad . transform) d)
+    where userDescriptors = [style, script] ++ additional
+          additional = additionalDesc options
+          style = styleDesc options
+          script = scriptDesc options
+          dRes = Resource {
+            location = "data.js",
+            content = (pad . transform) d
+            }
           pad s = T.concat ["visie(", s, ")"]
-          additional = additionalResources options
 
 visie = customVisie defaultOptions
-
-customVisieFiles :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO ()
-customVisieFiles options fileNameGetter transform d = do
-  (style, logic) <- getStyleAndLogicData fileNameGetter
-  customVisie options transform style logic d
-
-visieFiles = customVisieFiles defaultOptions

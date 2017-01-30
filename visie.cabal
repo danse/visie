@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                visie
-version:             0.4.1.1
+version:             0.5.0.0
 -- synopsis:            
 -- description:         
 -- license:             
@@ -18,7 +18,7 @@ data-files: data/d3.v4.js,
             data/d3.v3.js,
             data/d3.v2.js,
             data/style.css,
-            data/logic.js
+            data/script.js
             
 library
   hs-source-dirs:      src
