@@ -22,7 +22,7 @@ data Options = Options {
   indexType :: IndexType,
   scriptDesc :: ResourceDesc,
   styleDesc :: ResourceDesc,
-  additionalDesc :: [ResourceDesc]
+  additionalScripts :: [ResourceDesc]
 }
 
 defaultOptions = Options {
@@ -30,7 +30,7 @@ defaultOptions = Options {
   indexType = SVG,
   scriptDesc = ResourceDesc "data/script.js" "script.js",
   styleDesc = ResourceDesc "data/style.css" "style.css",
-  additionalDesc = []
+  additionalScripts = []
   }
 
 getResource fileNameGetter (ResourceDesc { fetch = f, serve = s}) = do
@@ -52,9 +52,10 @@ getCommonResources options = do
   d3 <- getCommonResource d3ResourceDesc
   pure [index, d3]
     where d3FileName = d3FileNameFromOptions options
+          scriptsToAdd = (map serve . additionalScripts) options
           index = Resource {
             location = "index.html",
-            content = makeIndex d3FileName (indexType options)
+            content = makeIndex d3FileName (indexType options) scriptsToAdd
             }
           d3ResourceDesc = ResourceDesc {
             fetch = "data/" ++ d3FileName,
@@ -68,7 +69,7 @@ customVisie options fileNameGetter transform d = do
   manyToTheBrowser (common ++ user ++ [dRes])
   return ()
     where userDescriptors = [style, script] ++ additional
-          additional = additionalDesc options
+          additional = additionalScripts options
           style = styleDesc options
           script = scriptDesc options
           dRes = Resource {
