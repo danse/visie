@@ -14,10 +14,11 @@ data IndexType = SVG | ChartDiv deriving Eq
 
 data Options = Options {
   d3Version :: D3Version,
-  indexType :: IndexType
+  indexType :: IndexType,
+  additionalResources :: [(String, T.Text)]
 }
 
-defaultOptions = Options Version4 SVG
+defaultOptions = Options Version4 SVG []
 
 getDataFileContent fileNameGetter path = do
   fileName <- fileNameGetter path
@@ -30,10 +31,11 @@ getStyleAndLogicData fileNameGetter = do
   logic <- getDataFileContent fileNameGetter "data/logic.js"
   return (Style style, Logic logic)
 
-d3FileNameFromOptions (Options d3Version indexType)
-  | d3Version == Version2 = "d3.v2.js"
-  | d3Version == Version3 = "d3.v3.js"
-  | d3Version == Version4 = "d3.v4.js"
+d3FileNameFromOptions o
+  | v == Version2 = "d3.v2.js"
+  | v == Version3 = "d3.v3.js"
+  | v == Version4 = "d3.v4.js"
+  where v = d3Version o
                                                       
 
 makeIndex options = T.concat [start, d3, content, end]
@@ -50,13 +52,14 @@ getCommonResources options = do
 customVisie :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
 customVisie options transform (Style style) (Logic logic) d = do
   common <- getCommonResources options
-  multiToTheBrowser (common ++ custom)
+  multiToTheBrowser (common ++ custom ++ additional)
   return ()
     where custom = [styleRes, logicRes, dRes]
           styleRes = ("style.css", style)
           logicRes = ("logic.js", logic)
           dRes = ("data.js", (pad . transform) d)
           pad s = T.concat ["visie(", s, ")"]
+          additional = additionalResources options
 
 visie = customVisie defaultOptions
 
