@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                visie
-version:             0.4.1.0
+version:             0.4.1.1
 -- synopsis:            
 -- description:         
 -- license:             
@@ -25,6 +25,7 @@ library
   exposed-modules:     Visie
                        Visie.ToTimeSeries
                        Visie.Data
+                       Visie.Index
   other-modules:       Paths_visie
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9,

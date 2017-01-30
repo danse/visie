@@ -5,12 +5,12 @@ import WebOutput (multiToTheBrowser)
 import Paths_visie (getDataFileName)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import Visie.Index
 
 newtype Style = Style T.Text
 newtype Logic = Logic T.Text
 
 data D3Version = Version2 | Version3 | Version4 deriving Eq
-data IndexType = SVG | ChartDiv deriving Eq
 
 data Options = Options {
   d3Version :: D3Version,
@@ -37,16 +37,9 @@ d3FileNameFromOptions o
   | v == Version4 = "d3.v4.js"
   where v = d3Version o
                                                       
-
-makeIndex options = T.concat [start, d3, content, end]
-  where start = "<!DOCTYPE html> <meta charset=\"utf-8\"> <link rel=\"stylesheet\" href=\"style.css\">"
-        d3 = T.concat ["<script type=\"text/javascript\" src=\"", d3FileNameFromOptions options, "\"></script>"]
-        content = (if indexType options == SVG then "<svg width=\"900\" height=\"500\"></svg>" else "<div class=\"chart\"></div>")
-        end = "<script type=\"text/javascript\" src=\"logic.js\"></script> <script type=\"text/javascript\" src=\"data.js\"></script>"
-
 getCommonResources options = do
   d3 <- getVisieFile ("data/" ++ d3FileName)
-  pure [("index.html", makeIndex options), (d3FileName, d3)]
+  pure [("index.html", makeIndex d3FileName (indexType options)), (d3FileName, d3)]
     where d3FileName = d3FileNameFromOptions options
 
 customVisie :: Options -> (a -> T.Text) -> Style -> Logic -> a -> IO ()
