@@ -24,17 +24,17 @@ fill t = Timestamped mempty t
 consume :: Monoid a => [DateTime] -> [Timestamped a] -> [Timestamped a]
 consume (t:ts) [] = []
 consume (t:ts) elements
-  | length preceding == 0 = (fill t) : rest
-  | otherwise = (foldl (merge t) (fill t) preceding) : rest
+  | length preceding == 0 = filled : rest
+  | otherwise = foldl (merge t) filled preceding : rest
   where (preceding, succeeding) = span ((<= t) . getTime) elements
+        filled = fill t
         rest = consume ts succeeding
 
 iterator :: NominalDiffTime -> DateTime -> [DateTime]
 iterator interval start = iterate (addUTCTime interval) start
 
 convert :: Monoid a => NominalDiffTime -> [Timestamped a] -> [Timestamped a]
-convert interval elements =
-  sampler sorted
+convert interval elements = sampler sorted
   where sorted = sortOn getTime elements
         times = iterator interval (getTime (head sorted))
         sampler = consume times
