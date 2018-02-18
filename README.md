@@ -1,3 +1,11 @@
+
+develop freely, seal and bring around, keep developing
+
+visie turns a d3 visualisation in a typed haskell function call, in a
+way that lets you free to conveniently keep developing the
+visualisation in javascript while using it around with the reliability
+and convenience of an haskell interface
+
 #### Troubleshooting
 
 ##### Visie opens a visualisation with an image viewer, rather than with a browser
