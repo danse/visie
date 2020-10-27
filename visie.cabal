@@ -28,7 +28,7 @@ library
                        Visie.Index
   other-modules:       Paths_visie
   -- other-extensions:    
-  build-depends:       base >=4.8 && <4.9,
+  build-depends:       base,
                        web-output,
                        text,
                        datetime,
