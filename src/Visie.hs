@@ -48,6 +48,7 @@ d3FileNameFromOptions o
   | v == Version4 = "d3.v4.js"
   where v = d3Version o
                                                       
+getCommonResources :: Options -> IO [Resource]
 getCommonResources options = do
   d3 <- getCommonResource d3ResourceDesc
   pure [index, d3]
@@ -66,13 +67,13 @@ customVisie :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO 
 customVisie options fileNameGetter transform d = do
   common <- getCommonResources options
   user <- sequence (map (getResource fileNameGetter) userDescriptors)
-  manyToTheBrowser (common ++ user ++ [dRes])
+  manyToTheBrowser (common ++ user ++ [dataRes])
   return ()
     where userDescriptors = [style, script] ++ additional
           additional = additionalScripts options
           style = styleDesc options
           script = scriptDesc options
-          dRes = Resource {
+          dataRes = Resource {
             location = "data.js",
             content = (pad . transform) d
             }
