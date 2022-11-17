@@ -32,7 +32,10 @@ library
                        web-output,
                        text,
                        datetime,
-                       time
+                       time,
+                       aeson,
+                       vector,
+                       scientific
   default-language:    Haskell2010
 
 Test-Suite test
