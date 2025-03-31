@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Visie where
 
-import WebOutput
+import Browse (browseLinked, Asset(..))
 import Paths_visie (getDataFileName)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -36,7 +36,7 @@ defaultOptions = Options {
 getResource fileNameGetter (ResourceDesc { fetch = f, serve = s}) = do
   fileName <- fileNameGetter f
   content <- T.readFile fileName
-  return Resource { location = s, content = content }
+  return Asset { location = s, content = content }
 
 -- common resources are included in the Visie package and can use the
 -- local getter
@@ -48,13 +48,13 @@ d3FileNameFromOptions o
   | v == Version4 = "d3.v4.js"
   where v = d3Version o
                                                       
-getCommonResources :: Options -> IO [Resource]
+getCommonResources :: Options -> IO [Asset]
 getCommonResources options = do
   d3 <- getCommonResource d3ResourceDesc
   pure [index, d3]
     where d3FileName = d3FileNameFromOptions options
           scriptsToAdd = (map serve . additionalScripts) options
-          index = Resource {
+          index = Asset {
             location = "index.html",
             content = makeIndex d3FileName (indexType options) scriptsToAdd
             }
@@ -67,16 +67,13 @@ customVisie :: Options -> (FilePath -> IO FilePath) -> (a -> T.Text) -> a -> IO 
 customVisie options fileNameGetter transform d = do
   common <- getCommonResources options
   user <- sequence (map (getResource fileNameGetter) userDescriptors)
-  manyToTheBrowser (common ++ user ++ [dataRes])
+  browseLinked (common <> user <> [dataRes])
   return ()
     where userDescriptors = [style, script] ++ additional
           additional = additionalScripts options
           style = styleDesc options
           script = scriptDesc options
-          dataRes = Resource {
-            location = "data.js",
-            content = (pad . transform) d
-            }
+          dataRes = Asset "data.js" . pad . transform $ d
           pad s = T.concat ["visie(", s, ")"]
 
 visie = customVisie defaultOptions
